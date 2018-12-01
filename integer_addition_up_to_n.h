@@ -5,15 +5,21 @@
 #ifndef PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H
 #define PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H
 
-#define test_until_n 1000
+#define test_until_n 2
 
-void begin_test_integer_summation();
+
+/**
+ * HELPER FUNCTIONS
+ */
+
+long local_integer_summation(long, long);
+
+long formula_summation(long integer_n);
 
 /**
  * LIST OF SUMMATION TECHNIQUE
  */
 
-long formula_summation(long integer_n);
 
 long serial_summation(long n);
 
@@ -27,17 +33,8 @@ long parallel_summation_using_critical(long n);
 
 void verify_parallel_summation_using_critical();
 
-long parallel_summation_using_block(long n);
+long parallel_summation_using_barrier(long n);
 
-void verify_parallel_summation_using_block();
-
-/**
- * HELPER FUNCTIONS
- */
-
-long local_integer_summation(long, long);
-
-
-void verify_serial_summation();
+void verify_parallel_summation_using_barrier();
 
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H

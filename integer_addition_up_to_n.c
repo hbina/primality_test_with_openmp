@@ -7,7 +7,7 @@
 #include "integer_addition_up_to_n.h"
 
 
-int number_of_threads = 4;
+#define number_of_threads 4
 
 long formula_summation(long integer_n) {
     return integer_n * (integer_n + 1) / 2;
@@ -68,7 +68,7 @@ void verify_parallel_summation_using_critical() {
     printf("parallel summation using critical verification tests passed\n");
 }
 
-long parallel_summation_using_block(long n) {
+long parallel_summation_using_barrier(long n) {
     long total_sum = 0;
     long local_steps = n / number_of_threads;
 #pragma omp parallel
@@ -81,34 +81,36 @@ long parallel_summation_using_block(long n) {
             to += 1;
         }
         long local_sum = local_integer_summation(from, to);
-#pragma omp critical
+#pragma omp barrier
         total_sum += local_sum;
     };
     return total_sum;
 }
 
-void verify_parallel_summation_using_block() {
+void verify_parallel_summation_using_barrier() {
     for (long a = 0; a < test_until_n; a++) {
         long formula_summation = a * (a + 1) / 2;
-        assert(formula_summation == parallel_summation_using_critical(a));
+        assert(formula_summation == parallel_summation_using_barrier(a));
     }
-    printf("parallel summation using block verification tests passed\n");
+    printf("parallel summation using barrier verification tests passed\n");
 }
 
 
 long parallel_summation_using_promotion_of_scalar(long integer_n) {
     long promoted_total_sum[number_of_threads];
-    omp_set_num_threads(number_of_threads);
+//    printf("integer_n:%ld", integer_n);
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
         promoted_total_sum[thread_id] = 0l;
         for (long local_begin = thread_id; local_begin <= integer_n; local_begin += omp_get_thread_num()) {
+            //  printf("thread_id:%d local_begin:%ld\n\n", thread_id, local_begin);
             promoted_total_sum[thread_id] += local_begin;
         }
     };
     long actual_total_sum = 0;
-    for (int a = 0; a < number_of_threads; a++) {
+    for (int a = 0; a < number_of_threads;
+         a++) {
         actual_total_sum += promoted_total_sum[a];
     }
     return actual_total_sum;
@@ -116,9 +118,7 @@ long parallel_summation_using_promotion_of_scalar(long integer_n) {
 
 void verify_parallel_summation_using_promotion_of_scalar() {
     for (long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        printf("testing:%ld formula_summation:%ld parallel_summation_using_promotion_of_scalar:%ld\n", integer_n,
-               formula_summation(integer_n), parallel_summation_using_promotion_of_scalar(integer_n));
-        //  assert(formula_summation(integer_n) == parallel_summation_using_promotion_of_scalar(integer_n));
+        assert(formula_summation(integer_n) == parallel_summation_using_promotion_of_scalar(integer_n));
     }
     printf("parallel summation using promotion of scalar verification tests passed\n");
 }
