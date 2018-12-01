@@ -98,25 +98,17 @@ void verify_parallel_summation_using_block() {
 
 long parallel_summation_using_promotion_of_scalar(long integer_n) {
     long promoted_total_sum[number_of_threads];
-    long local_steps = integer_n / number_of_threads;
+    int number_of_threads = 4;
     omp_set_num_threads(number_of_threads);
 #pragma omp parallel
     {
-        long from = local_steps * omp_get_thread_num();
-        long to = from + local_steps;
-
-        /**
-         * If you are the last guy, you will have to do more work.
-         * Could also delegate this to the main thread.
-         * Since the main thread will be responsible for merging all of them together.
-         * This is done so as to not waste time with context switching
-         * But no real way of doing this...
-         */
-        if (omp_get_thread_num() == (omp_get_num_threads() - 1)) {
-            to += integer_n % omp_get_num_threads(); // do the rest of the work
-            to += 1; // to include last integer
+        int thread_id = omp_get_thread_num();
+        for (long local_begin = thread_id; local_begin < integer_n; local_begin++) {
+            promoted_total_sum[thread_id] = local_begin;
         }
-        promoted_total_sum[omp_get_thread_num()] = local_integer_summation(from, to);
+        if (thread_id == 0) {
+            number_of_threads = omp_get_num_threads();
+        }
     };
     long actual_total_sum = 0;
     for (int a = 0; a < number_of_threads; a++) {
