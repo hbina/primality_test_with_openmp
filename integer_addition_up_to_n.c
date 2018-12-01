@@ -27,9 +27,9 @@ long local_integer_summation(long from, long to) {
  */
 
 
-long serial_summation(long n) {
+long serial_summation(long integer_n) {
     long result = 0;
-    for (long a = 1; a <= n; a++) {
+    for (long a = 1; a <= integer_n; a++) {
         result += a;
     }
     return result;
@@ -42,16 +42,52 @@ void verify_serial_summation() {
     printf("serial summation verification tests passed\n");
 }
 
-long parallel_summation_using_critical(long n) {
+long parallel_summation_using_atomic(long integer_n) {
     long total_sum = 0;
-    long local_steps = n / number_of_threads;
+    long local_steps = integer_n / number_of_threads;
 #pragma omp parallel
     {
-        long from = local_steps * omp_get_thread_num();
+        int thread_id = omp_get_thread_num();
+        int thread_count = omp_get_num_threads();
+        long from = local_steps * thread_id;
         long to = from + local_steps;
 
-        if (omp_get_thread_num() == (omp_get_num_threads() - 1)) {
-            to += n % omp_get_num_threads();
+        /**
+         * The last thread will have to do more work because some integer_n will not be divisible by number_of_threads
+         */
+        if (thread_id == (thread_count - 1)) {
+            to += integer_n % thread_count;
+            to += 1;
+        }
+        long local_sum = local_integer_summation(from, to);
+#pragma omp atomic
+        total_sum += local_sum;
+    };
+    return total_sum;
+}
+
+void verify_parallel_summation_using_atomic() {
+    for (long integer_n = 0; integer_n < test_until_n; integer_n++) {
+        assert(formula_summation(integer_n) == parallel_summation_using_atomic(integer_n));
+    }
+    printf("parallel summation using atomic verification tests passed\n");
+}
+
+long parallel_summation_using_critical(long integer_n) {
+    long total_sum = 0;
+    long local_steps = integer_n / number_of_threads;
+#pragma omp parallel
+    {
+        int thread_id = omp_get_thread_num();
+        int thread_count = omp_get_num_threads();
+        long from = local_steps * thread_id;
+        long to = from + local_steps;
+
+        /**
+         * The last thread will have to do more work because some integer_n will not be divisible by number_of_threads
+         */
+        if (thread_id == (thread_count - 1)) {
+            to += integer_n % thread_count;
             to += 1;
         }
         long local_sum = local_integer_summation(from, to);
@@ -68,16 +104,18 @@ void verify_parallel_summation_using_critical() {
     printf("parallel summation using critical verification tests passed\n");
 }
 
-long parallel_summation_using_barrier(long n) {
+long parallel_summation_using_barrier(long integer_n) {
     long total_sum = 0;
-    long local_steps = n / number_of_threads;
+    long local_steps = integer_n / number_of_threads;
 #pragma omp parallel
     {
-        long from = local_steps * omp_get_thread_num();
+        int thread_id = omp_get_thread_num();
+        int thread_count = 4;
+        long from = local_steps * thread_id;
         long to = from + local_steps;
 
-        if (omp_get_thread_num() == (omp_get_num_threads() - 1)) {
-            to += n % omp_get_num_threads();
+        if (thread_id == (thread_count - 1)) {
+            to += integer_n % thread_count;
             to += 1;
         }
         long local_sum = local_integer_summation(from, to);
@@ -88,9 +126,11 @@ long parallel_summation_using_barrier(long n) {
 }
 
 void verify_parallel_summation_using_barrier() {
-    for (long a = 0; a < test_until_n; a++) {
-        long formula_summation = a * (a + 1) / 2;
-        assert(formula_summation == parallel_summation_using_barrier(a));
+    for (long integer_n = 0; integer_n < test_until_n; integer_n++) {
+        printf("integer_n:%ld\n", integer_n);
+        printf("formula_summation:%ld\n", formula_summation(integer_n));
+        printf(" parallel_summation_using_barrier:%ld\n", parallel_summation_using_barrier(integer_n));
+//        assert(formula_summation(integer_n) == parallel_summation_using_barrier(integer_n));
     }
     printf("parallel summation using barrier verification tests passed\n");
 }
@@ -98,13 +138,11 @@ void verify_parallel_summation_using_barrier() {
 
 long parallel_summation_using_promotion_of_scalar(long integer_n) {
     long promoted_total_sum[number_of_threads];
-//    printf("integer_n:%ld", integer_n);
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
         promoted_total_sum[thread_id] = 0l;
-        for (long local_begin = thread_id; local_begin <= integer_n; local_begin += omp_get_thread_num()) {
-            //  printf("thread_id:%d local_begin:%ld\n\n", thread_id, local_begin);
+        for (long local_begin = thread_id; local_begin <= integer_n; local_begin += 4) {
             promoted_total_sum[thread_id] += local_begin;
         }
     };

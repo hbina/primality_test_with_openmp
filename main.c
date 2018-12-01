@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <omp.h>
-#include <assert.h>
 #include "benchmark_wrapper.h"
 #include "integer_addition_up_to_n.h"
 // TODO: Implement False Sharing, PADDING, Barrier, Mutual Exclusion
@@ -19,6 +17,9 @@ int main() {
 
     printf("parallel_summation_using_barrier\n");
     benchmark_wrapper(&parallel_summation_using_barrier);
+
+    printf("parallel_summation_using_atomic\n");
+    benchmark_wrapper(&parallel_summation_using_atomic);
 
     printf("parallel_summation_using_critical\n");
     benchmark_wrapper(&parallel_summation_using_critical);

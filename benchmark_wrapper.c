@@ -11,5 +11,5 @@ void benchmark_wrapper(long (*function_to_benchmark)(long)) {
         function_to_benchmark(integer_n);
     }
     double t_diff = omp_get_wtime() - t_begin;
-    printf("completion takes %e seconds", t_diff);
+    printf("completion takes %e seconds\n", t_diff);
 }

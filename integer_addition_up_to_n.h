@@ -5,7 +5,7 @@
 #ifndef PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H
 #define PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H
 
-#define test_until_n 2
+#define test_until_n 1000g
 
 
 /**
@@ -21,7 +21,7 @@ long formula_summation(long integer_n);
  */
 
 
-long serial_summation(long n);
+long serial_summation(long integer_n);
 
 void verify_serial_summation();
 
@@ -29,11 +29,15 @@ long parallel_summation_using_promotion_of_scalar(long integer_n);
 
 void verify_parallel_summation_using_promotion_of_scalar();
 
-long parallel_summation_using_critical(long n);
+long parallel_summation_using_atomic(long integer_n);
+
+void verify_parallel_summation_using_atomic();
+
+long parallel_summation_using_critical(long integer_n);
 
 void verify_parallel_summation_using_critical();
 
-long parallel_summation_using_barrier(long n);
+long parallel_summation_using_barrier(long integer_n);
 
 void verify_parallel_summation_using_barrier();
 
