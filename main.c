@@ -6,8 +6,10 @@
 int main() {
     verify_serial_summation();
     verify_parallel_summation_using_promotion_of_scalar();
-    verify_parallel_summation_using_barrier();
+    // verify_parallel_summation_using_barrier();
+    verify_parallel_summation_using_atomic();
     verify_parallel_summation_using_critical();
+
 
     printf("serial_summation\n");
     benchmark_wrapper(&serial_summation);
@@ -15,8 +17,8 @@ int main() {
     printf("parallel_summation_using_promotion_of_scalar\n");
     benchmark_wrapper(&parallel_summation_using_promotion_of_scalar);
 
-    printf("parallel_summation_using_barrier\n");
-    benchmark_wrapper(&parallel_summation_using_barrier);
+    // printf("parallel_summation_using_barrier\n");
+    //benchmark_wrapper(&parallel_summation_using_barrier);
 
     printf("parallel_summation_using_atomic\n");
     benchmark_wrapper(&parallel_summation_using_atomic);
