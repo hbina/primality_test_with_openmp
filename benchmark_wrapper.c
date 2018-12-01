@@ -5,9 +5,11 @@
 #include <omp.h>
 #include <stdio.h>
 
-void benchmark_wrapper(void (*function_to_benchmark)()) {
+void benchmark_wrapper(long (*function_to_benchmark)(long)) {
     double t_begin = omp_get_wtime();
-    function_to_benchmark();
+    for (long integer_n = 1; integer_n < 1000; integer_n++){
+        function_to_benchmark(integer_n);
+    }
     double t_diff = omp_get_wtime() - t_begin;
     printf("completion takes %e seconds", t_diff);
 }
