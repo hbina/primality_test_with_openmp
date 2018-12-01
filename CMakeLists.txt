@@ -8,4 +8,4 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-add_executable(performance_of_prime_primality main.c integer_addition_up_to_n.h benchmark_wrapper.h integer_addition_up_to_n.c benchmark_wrapper.c)
+add_executable(performance_of_prime_primality main.c integer_addition_up_to_n.h benchmark_wrapper.h integer_addition_up_to_n.c benchmark_wrapper.c integer_primality_test.c integer_primality_test.h)

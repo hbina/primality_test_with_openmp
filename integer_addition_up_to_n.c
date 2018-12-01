@@ -104,37 +104,6 @@ void verify_parallel_summation_using_critical() {
     printf("parallel summation using critical verification tests passed\n");
 }
 
-long parallel_summation_using_barrier(long integer_n) {
-    long total_sum = 0;
-    long local_steps = integer_n / number_of_threads;
-#pragma omp parallel
-    {
-        int thread_id = omp_get_thread_num();
-        int thread_count = 4;
-        long from = local_steps * thread_id;
-        long to = from + local_steps;
-
-        if (thread_id == (thread_count - 1)) {
-            to += integer_n % thread_count;
-            to += 1;
-        }
-        long local_sum = local_integer_summation(from, to);
-#pragma omp barrier
-        total_sum += local_sum;
-    };
-    return total_sum;
-}
-
-void verify_parallel_summation_using_barrier() {
-    for (long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        printf("integer_n:%ld\n", integer_n);
-        printf("formula_summation:%ld\n", formula_summation(integer_n));
-        printf(" parallel_summation_using_barrier:%ld\n", parallel_summation_using_barrier(integer_n));
-//        assert(formula_summation(integer_n) == parallel_summation_using_barrier(integer_n));
-    }
-    printf("parallel summation using barrier verification tests passed\n");
-}
-
 
 long parallel_summation_using_promotion_of_scalar(long integer_n) {
     long promoted_total_sum[number_of_threads];

@@ -37,8 +37,4 @@ long parallel_summation_using_critical(long integer_n);
 
 void verify_parallel_summation_using_critical();
 
-long parallel_summation_using_barrier(long integer_n);
-
-void verify_parallel_summation_using_barrier();
-
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_ADDITION_UP_TO_N_H
