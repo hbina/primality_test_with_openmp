@@ -21,7 +21,7 @@ unsigned long long primes_example[6] = {
         3427376149l,
         1461729319l,
         1823204723l,
-        2787253289
+        2787253289l
 };
 
 int main() {
@@ -53,9 +53,9 @@ int main() {
     }
     //verify_serial_primality_test();
     //verify_parallel_primality_test_using_promotion_of_scalar();
-    printf("serial takes %e to complete",
+    printf("serial takes %e to complete\n",
            primality_test_benchmark_wrapper(&serial_primality_test, primes_example, 6));
-    printf("parallel takes %e to complete",
+    printf("parallel takes %e to complete\n",
            primality_test_benchmark_wrapper(&parallel_primality_test_using_promotion_of_scalar, primes_example, 6));
     return 0;
 }

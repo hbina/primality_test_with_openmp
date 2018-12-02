@@ -21,7 +21,7 @@ local_primality_test(unsigned long long integer_of, unsigned long long integer_f
 }
 
 char serial_primality_test(unsigned long long integer_n) {
-    local_primality_test(integer_n, 3, integer_n);
+    return local_primality_test(integer_n, 3, integer_n);
 }
 
 void verify_serial_primality_test() {
@@ -33,7 +33,7 @@ void verify_serial_primality_test() {
 }
 
 char parallel_primality_test_using_promotion_of_scalar(unsigned long long integer_n) {
-    if (integer_n <= omp_get_max_threads() * omp_get_max_threads()) {
+    if (integer_n <= (unsigned long long) omp_get_max_threads() * omp_get_max_threads()) {
         return serial_primality_test(integer_n);
     } else if (!(integer_n % 2l)) {
         return false;

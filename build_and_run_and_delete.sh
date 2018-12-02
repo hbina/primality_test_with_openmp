@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-gcc -Wall -Wverbose -o test.out -fopenmp main.c benchmark_wrapper.c integer_addition_up_to_n.c
+gcc -DNUMBER_OF_THREADS=4 -Wall -O3 -Wpedantic -Wextra -o test.out -fopenmp main.c benchmark_wrapper.c integer_addition_up_to_n.c integer_primality_test.c
 ./test.out
-rm ./test_out
+rm ./test.out
