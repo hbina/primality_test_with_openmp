@@ -3,7 +3,7 @@
 #include "integer_addition_up_to_n.h"
 #include "integer_primality_test.h"
 
-#define HOW_MANY_TIMES 100
+#define HOW_MANY_TIMES 1000
 struct benchmark_statistics {
     double serial_summation;
     double parallel_summation_using_promotion_of_scalar;
@@ -39,5 +39,6 @@ int main() {
     }
 
     verify_serial_primality_test();
+    verify_parallel_primality_test_using_promotion_of_scalar();
     return 0;
 }

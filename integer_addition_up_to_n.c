@@ -6,9 +6,6 @@
 #include <stdio.h>
 #include "integer_addition_up_to_n.h"
 
-
-#define number_of_threads 4
-
 long formula_summation(long integer_n) {
     return integer_n * (integer_n + 1) / 2;
 }
@@ -44,7 +41,7 @@ void verify_serial_summation() {
 
 long parallel_summation_using_atomic(long integer_n) {
     long total_sum = 0;
-    long local_steps = integer_n / number_of_threads;
+    long local_steps = integer_n / NUMBER_OF_THREADS;
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
@@ -53,7 +50,7 @@ long parallel_summation_using_atomic(long integer_n) {
         long to = from + local_steps;
 
         /**
-         * The last thread will have to do more work because some integer_n will not be divisible by number_of_threads
+         * The last thread will have to do more work because some integer_n will not be divisible by NUMBER_OF_THREADS
          */
         if (thread_id == (thread_count - 1)) {
             to += integer_n % thread_count;
@@ -75,7 +72,7 @@ void verify_parallel_summation_using_atomic() {
 
 long parallel_summation_using_critical(long integer_n) {
     long total_sum = 0;
-    long local_steps = integer_n / number_of_threads;
+    long local_steps = integer_n / NUMBER_OF_THREADS;
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
@@ -84,7 +81,7 @@ long parallel_summation_using_critical(long integer_n) {
         long to = from + local_steps;
 
         /**
-         * The last thread will have to do more work because some integer_n will not be divisible by number_of_threads
+         * The last thread will have to do more work because some integer_n will not be divisible by NUMBER_OF_THREADS
          */
         if (thread_id == (thread_count - 1)) {
             to += integer_n % thread_count;
@@ -106,7 +103,7 @@ void verify_parallel_summation_using_critical() {
 
 
 long parallel_summation_using_promotion_of_scalar(long integer_n) {
-    long promoted_total_sum[number_of_threads];
+    long promoted_total_sum[NUMBER_OF_THREADS];
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
@@ -116,8 +113,7 @@ long parallel_summation_using_promotion_of_scalar(long integer_n) {
         }
     };
     long actual_total_sum = 0;
-    for (int a = 0; a < number_of_threads;
-         a++) {
+    for (int a = 0; a < NUMBER_OF_THREADS; a++) {
         actual_total_sum += promoted_total_sum[a];
     }
     return actual_total_sum;

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(performance_of_prime_primality C)
 
+add_compile_definitions(NUMBER_OF_THREADS=4)
+
+
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
