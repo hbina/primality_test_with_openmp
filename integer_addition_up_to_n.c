@@ -32,13 +32,6 @@ unsigned long long serial_summation(unsigned long long integer_n) {
     return result;
 }
 
-void verify_serial_summation(unsigned long long test_until_n) {
-    for (unsigned long long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        assert(formula_summation(integer_n) == serial_summation(integer_n));
-    }
-    printf("serial summation verification tests passed\n");
-}
-
 unsigned long long parallel_summation_using_atomic(unsigned long long integer_n) {
     unsigned long long total_sum = 0l;
     unsigned long long local_steps = integer_n / omp_get_max_threads();
@@ -61,13 +54,6 @@ unsigned long long parallel_summation_using_atomic(unsigned long long integer_n)
         total_sum += local_sum;
     };
     return total_sum;
-}
-
-void verify_parallel_summation_using_atomic(unsigned long long test_until_n) {
-    for (unsigned long long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        assert(formula_summation(integer_n) == parallel_summation_using_atomic(integer_n));
-    }
-    printf("parallel summation using atomic verification tests passed\n");
 }
 
 unsigned long long parallel_summation_using_critical(unsigned long long integer_n) {
@@ -94,14 +80,6 @@ unsigned long long parallel_summation_using_critical(unsigned long long integer_
     return total_sum;
 }
 
-void verify_parallel_summation_using_critical(unsigned long long test_until_n) {
-    for (unsigned long long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        assert(formula_summation(integer_n) == parallel_summation_using_critical(integer_n));
-    }
-    printf("parallel summation using critical verification tests passed\n");
-}
-
-
 unsigned long long parallel_summation_using_promotion_of_scalar(unsigned long long integer_n) {
     unsigned long long promoted_total_sum[4] = {0};
 #pragma omp parallel
@@ -120,10 +98,9 @@ unsigned long long parallel_summation_using_promotion_of_scalar(unsigned long lo
     return actual_total_sum;
 }
 
-void verify_parallel_summation_using_promotion_of_scalar(unsigned long long test_until_n) {
+void verify_summation(unsigned long long int (*func)(unsigned long long int), unsigned long long test_until_n) {
     for (unsigned long long integer_n = 0; integer_n < test_until_n; integer_n++) {
-        assert(formula_summation(integer_n) == parallel_summation_using_promotion_of_scalar(integer_n));
+        assert(formula_summation(integer_n) == func(integer_n));
     }
-    printf("parallel summation using promotion of scalar verification tests passed\n");
 }
 

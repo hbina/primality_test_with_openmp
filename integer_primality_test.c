@@ -31,7 +31,7 @@ char parallel_primality_test_using_promotion_of_scalar(unsigned long long intege
     } else if (!(integer_n % 2l)) {
         return false;
     } else {
-        char isPrime[4] = {1};
+        char is_prime[4] = {1};
         unsigned long long local_steps = integer_n / omp_get_max_threads();
 #pragma omp parallel
         {
@@ -46,16 +46,14 @@ char parallel_primality_test_using_promotion_of_scalar(unsigned long long intege
                 local_end -= 2l; // this is true for thread_id == omp_get_max_threads(), just decrement by 2 to get the previous odd number
             for (; local_begin < local_end; local_begin += 2l) {
                 if (!(integer_n % local_begin)) {
-                    isPrime[thread_id] = false;
+                    is_prime[thread_id] = false;
                     local_begin = local_end;
                 }
-                void verify_serial_primality_test();
-
             }
         };
         char final_bool = false;
         for (int a = 0; a < omp_get_max_threads(); a++) {
-            final_bool |= isPrime[a];
+            final_bool |= is_prime[a];
         }
         return final_bool;
     }
@@ -75,5 +73,44 @@ void verify_primality_test(
 }
 
 char parallel_primality_test_using_sentinel(unsigned long long integer_n) {
-    return 0;
+    /**
+ * If the given number is smaller than the square of the number of available threads, just use serial execution
+ */
+    if (integer_n <= (unsigned long long) omp_get_max_threads() * omp_get_max_threads()) {
+        return serial_primality_test(integer_n);
+    } else if (!(integer_n % 2l)) {
+        return false;
+    } else {
+        char is_prime[4] = {1};
+        unsigned long long local_steps = integer_n / omp_get_max_threads();
+#pragma omp parallel
+        {
+            int thread_id = omp_get_thread_num();
+            unsigned long long local_begin = local_steps * thread_id;
+            if (local_begin < 3l)
+                local_begin = 3l; // this is true for thread_id==0 because local_begin will be less than 3, starts with at least 3 for god's sake
+            if (!(local_begin % 2l))
+                local_begin++; // if local_begin somehow is divisible by 2, then just increment to get odd value
+            unsigned long long local_end = local_begin + local_steps;
+            if (local_end == integer_n)
+                local_end -= 2l; // this is true for thread_id == omp_get_max_threads(), just decrement by 2 to get the previous odd number
+            for (; local_begin < local_end; local_begin += 2l) {
+                if (!(integer_n % local_begin)) {
+                    is_prime[thread_id] = false;
+                    local_begin = local_end;
+                } else {
+                    for (int a = 0; a < 4; a++) {
+                        if (!is_prime[a]) {
+                            local_begin = local_end;
+                        }
+                    }
+                }
+            }
+        };
+        char final_bool = false;
+        for (int a = 0; a < omp_get_max_threads(); a++) {
+            final_bool |= is_prime[a];
+        }
+        return final_bool;
+    }
 }

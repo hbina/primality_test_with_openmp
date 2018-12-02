@@ -4,11 +4,9 @@
 
 #include <omp.h>
 
-double addition_benchmark_wrapper(unsigned long long (*func)(unsigned long long)) {
+double addition_benchmark_wrapper(unsigned long long (*func)(unsigned long long), unsigned long long integer_n) {
     double t_begin = omp_get_wtime();
-    for (unsigned long long integer_n = 1; integer_n < 10000l; integer_n++) {
-        func(integer_n);
-    }
+    func(integer_n);
     double t_diff = omp_get_wtime() - t_begin;
     return t_diff;
 }
