@@ -7,8 +7,6 @@
 #include <assert.h>
 #include <omp.h>
 
-#define test_until_n 10
-
 char
 local_primality_test(unsigned long long integer_of, unsigned long long integer_from, unsigned long long integer_to) {
     if (!integer_of) return false;
@@ -24,22 +22,17 @@ char serial_primality_test(unsigned long long integer_n) {
     return local_primality_test(integer_n, 3, integer_n);
 }
 
-void verify_serial_primality_test() {
-    for (unsigned long long integer_n = 2; integer_n < test_until_n; integer_n += 2l) {
-        assert(serial_primality_test(integer_n) == 0);
-        serial_primality_test(integer_n);
-    }
-    printf("serial primality test verification tests passed\n");
-}
-
 char parallel_primality_test_using_promotion_of_scalar(unsigned long long integer_n) {
+    /**
+     * If the given number is smaller than the square of the number of available threads, just use serial execution
+     */
     if (integer_n <= (unsigned long long) omp_get_max_threads() * omp_get_max_threads()) {
         return serial_primality_test(integer_n);
     } else if (!(integer_n % 2l)) {
         return false;
     } else {
-        char isPrime[NUMBER_OF_THREADS] = {1};
-        unsigned long long local_steps = integer_n / NUMBER_OF_THREADS;
+        char isPrime[4] = {1};
+        unsigned long long local_steps = integer_n / omp_get_max_threads();
 #pragma omp parallel
         {
             int thread_id = omp_get_thread_num();
@@ -50,31 +43,37 @@ char parallel_primality_test_using_promotion_of_scalar(unsigned long long intege
                 local_begin++; // if local_begin somehow is divisible by 2, then just increment to get odd value
             unsigned long long local_end = local_begin + local_steps;
             if (local_end == integer_n)
-                local_end -= 2l; // this is true for thread_id == NUMBER_OF_THREADS, just decrement by 2 to get the previous odd number
+                local_end -= 2l; // this is true for thread_id == omp_get_max_threads(), just decrement by 2 to get the previous odd number
             for (; local_begin < local_end; local_begin += 2l) {
                 if (!(integer_n % local_begin)) {
                     isPrime[thread_id] = false;
                     local_begin = local_end;
                 }
+                void verify_serial_primality_test();
+
             }
         };
         char final_bool = false;
-        for (int a = 0; a < NUMBER_OF_THREADS; a++) {
+        for (int a = 0; a < omp_get_max_threads(); a++) {
             final_bool |= isPrime[a];
         }
         return final_bool;
     }
 }
 
-void
-verify_parallel_primality_test_using_promotion_of_scalar(unsigned long long *prime_examples, int prime_examples_count) {
-
-    for (unsigned long long integer_n = 4; integer_n < test_until_n; integer_n += 2l) {
+void verify_primality_test(
+        char (*prime_function)(unsigned long long int),
+        unsigned long long *prime_examples,
+        int num_of_prime_examples
+) {
+    for (unsigned long long integer_n = 4; integer_n < 1000l; integer_n += 2l) {
         assert(parallel_primality_test_using_promotion_of_scalar(integer_n) == false);
     }
-    for (int a = 0; a < prime_examples_count; a++) {
-        printf("testing:%llu\n", prime_examples[a]);
-        assert(parallel_primality_test_using_promotion_of_scalar(prime_examples[a]) == true);
+    for (int a = 0; a < num_of_prime_examples; a++) {
+        assert(prime_function(prime_examples[a]) == true);
     }
-    printf("parallel primality test using promotion of scalar verification tests passed\n");
+}
+
+char parallel_primality_test_using_sentinel(unsigned long long integer_n) {
+    return 0;
 }
