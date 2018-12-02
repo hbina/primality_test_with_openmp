@@ -17,7 +17,7 @@ void verify_serial_primality_test();
 
 char parallel_primality_test_using_promotion_of_scalar(unsigned long long);
 
-void verify_parallel_primality_test_using_promotion_of_scalar();
+void verify_parallel_primality_test_using_promotion_of_scalar(unsigned long long *, int);
 
 char parallel_primality_test_using_atomic(unsigned long long);
 

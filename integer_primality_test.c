@@ -9,19 +9,6 @@
 
 #define test_until_n 10
 
-unsigned long long primes_example[] = {
-        //263148883742208227l,
-        //4211612917736675431l,
-        //1870964419912864547l,
-        //2219262178829073559l,
-        556640177l,
-        622192141l,
-        3427376149l,
-        1461729319l,
-        1823204723l,
-        2787253289
-};
-
 char
 local_primality_test(unsigned long long integer_of, unsigned long long integer_from, unsigned long long integer_to) {
     if (!integer_of) return false;
@@ -42,16 +29,6 @@ void verify_serial_primality_test() {
         assert(serial_primality_test(integer_n) == 0);
         serial_primality_test(integer_n);
     }
-    assert(serial_primality_test(3) == true);
-    assert(serial_primality_test(5) == true);
-    assert(serial_primality_test(7) == true);
-    assert(serial_primality_test(9) == false);
-    assert(serial_primality_test(11) == true);
-    assert(serial_primality_test(13) == true);
-    assert(serial_primality_test(15) == false);
-    assert(serial_primality_test(17) == true);
-    assert(serial_primality_test(19) == true);
-    assert(serial_primality_test(21) == false);
     printf("serial primality test verification tests passed\n");
 }
 
@@ -89,13 +66,15 @@ char parallel_primality_test_using_promotion_of_scalar(unsigned long long intege
     }
 }
 
-void verify_parallel_primality_test_using_promotion_of_scalar() {
+void
+verify_parallel_primality_test_using_promotion_of_scalar(unsigned long long *prime_examples, int prime_examples_count) {
+
     for (unsigned long long integer_n = 4; integer_n < test_until_n; integer_n += 2l) {
         assert(parallel_primality_test_using_promotion_of_scalar(integer_n) == false);
     }
-    for (int a = 0; a < 6; a++) {
-        printf("testing:%llu\n", primes_example[a]);
-        assert(parallel_primality_test_using_promotion_of_scalar(primes_example[a]) == true);
+    for (int a = 0; a < prime_examples_count; a++) {
+        printf("testing:%llu\n", prime_examples[a]);
+        assert(parallel_primality_test_using_promotion_of_scalar(prime_examples[a]) == true);
     }
     printf("parallel primality test using promotion of scalar verification tests passed\n");
 }
