@@ -41,10 +41,10 @@ unsigned long long ipow(unsigned long long base, unsigned char exp) {
 }
 
 int main() {
-    summation_statistics summation_stats[MAX_INTEGER_IN_LOG_10];
-    primality_statistics primality_stats = {0, 0, 0};
+    summation_statistics summation_stats = {0};
+    primality_statistics primality_stats = {0};
 
-    unsigned long long max_integer_pow10 = ipow(10l, (unsigned long long int) MAX_INTEGER_IN_LOG_10);
+    unsigned long long max_integer_pow10 = ipow(2l, (unsigned long long int) MAX_INTEGER_IN_LOG_2);
 
     verify_summation(
             serial_summation,
@@ -82,24 +82,15 @@ int main() {
     printf("parallel primality test using sentinel verification tests passed\n");
 
     for (unsigned char integer_n = 0; integer_n < MAX_INTEGER_IN_LOG_2; integer_n++) {
-        unsigned long long integer_n_pow10 = ipow(2l, integer_n);
-        summation_stats[integer_n].serial_summation = addition_benchmark_wrapper(
-                &serial_summation, integer_n_pow10);
-        summation_stats[integer_n].parallel_summation_using_promotion_of_scalar = addition_benchmark_wrapper(
-                &parallel_summation_using_promotion_of_scalar, integer_n_pow10);
-        summation_stats[integer_n].parallel_summation_using_atomic = addition_benchmark_wrapper(
-                &parallel_summation_using_atomic, integer_n_pow10);
-        summation_stats[integer_n].parallel_summation_using_critical = addition_benchmark_wrapper(
-                &parallel_summation_using_critical, integer_n_pow10);
+        summation_stats.serial_summation += addition_benchmark_wrapper(
+                &serial_summation, max_integer_pow10);
+        summation_stats.parallel_summation_using_promotion_of_scalar += addition_benchmark_wrapper(
+                &parallel_summation_using_promotion_of_scalar, max_integer_pow10);
+        summation_stats.parallel_summation_using_atomic += addition_benchmark_wrapper(
+                &parallel_summation_using_atomic, max_integer_pow10);
+        summation_stats.parallel_summation_using_critical += addition_benchmark_wrapper(
+                &parallel_summation_using_critical, max_integer_pow10);
     }
-
-    printf("drawing\n");
-    FILE *gnuplot = popen("gnuplot", "w");
-    fprintf(gnuplot, "plot '-'\n");
-    for (int i = 0; i < MAX_INTEGER_IN_LOG_2; i++)
-        fprintf(gnuplot, "%d %e\n", i, summation_stats[i].parallel_summation_using_critical);
-    fprintf(gnuplot, "e\n");
-    fflush(gnuplot);
 
     for (int a = 0; a < 10; a++) {
         primality_stats.serial_primality_test += primality_test_benchmark_wrapper(
