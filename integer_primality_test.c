@@ -7,6 +7,22 @@
 #include <assert.h>
 #include <omp.h>
 
+unsigned long long get_first_prime_divisor(unsigned long long integer_of) {
+    if (integer_of <= 1ull) {
+        return 1ull;
+    } else if (!(integer_of % 2ull)) {
+        return 2ull;
+    } else {
+        for (unsigned long long integer_from = 3ull; integer_from <= integer_of / 2; integer_from += 2ull) {
+            if (integer_of % integer_from == 0ull) {
+                printf("first prime divisor of %llu is %llu\n", integer_of, integer_from);
+                return integer_from;
+            }
+        }
+        printf("first prime divisor of %llu is itself\n", integer_of);
+        return integer_of;
+    }
+}
 
 int local_primality_test(
         unsigned long long integer_of,
@@ -18,7 +34,7 @@ int local_primality_test(
         return false;
     } else {
         for (; integer_from <= integer_to; integer_from += 2ull) {
-            if (integer_of % integer_from == 0) return 0;
+            if (integer_of % integer_from == 0ull) return 0;
         }
         return 1;
     }

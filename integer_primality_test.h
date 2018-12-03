@@ -9,6 +9,8 @@
 #define false 0
 
 
+unsigned long long get_first_prime_divisor(unsigned long long);
+
 int local_primality_test(unsigned long long, unsigned long long, unsigned long long);
 
 int serial_primality_test(unsigned long long);

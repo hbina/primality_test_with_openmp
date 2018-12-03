@@ -3,7 +3,7 @@
 #include "integer_primality_test.h"
 
 #define NUM_OF_SMALL_PRIME_EXAMPLES 6
-#define NUM_OF_LARGE_PRIME_EXAMPLES 6
+
 typedef struct {
     double serial_summation;
     double parallel_summation_using_promotion_of_scalar;
@@ -35,7 +35,7 @@ unsigned long long small_non_prime_examples[NUM_OF_SMALL_PRIME_EXAMPLES] = {
 };
 
 void benchmark_primality_test(unsigned long long *examples, int number_of_prime_examples) {
-    primality_statistics primality_stats = {0};
+    primality_statistics primality_stats = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     for (int a = 0; a < number_of_prime_examples; a++) {
         primality_stats.serial_primality_test += primality_test_benchmark_wrapper(
                 &serial_primality_test,
@@ -50,8 +50,7 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
                         &parallel_primality_test_using_sentinel,
                         examples[a]);
     }
-
-    //printf("serial_primality_test:\n%e\n", primality_stats.serial_primality_test / number_of_prime_examples);
+    printf("serial_primality_test:\n%e\n", primality_stats.serial_primality_test / number_of_prime_examples);
     printf("parallel_primality_test_using_promotion_of_scalar:\n%e\n",
            primality_stats.parallel_primality_test_using_promotion_of_scalar / number_of_prime_examples);
     printf("parallel_primality_test_using_sentinel:\n%e\n",
@@ -60,6 +59,7 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
 
 int main() {
 
+#if UNIT_TEST
 #if VERBOSE
     printf("verifying serial primality test\n");
 #endif
@@ -99,10 +99,12 @@ int main() {
             parallel_primality_test_using_sentinel,
             small_non_prime_examples,
             NUM_OF_SMALL_PRIME_EXAMPLES);
-
 #if VERBOSE
     printf("parallel primality test using sentinel verification tests passed\n");
 #endif
+#endif
+
+#if BENCHMARK
 #if VERBOSE
     printf("\n\nprimality test performance on small prime integers\n");
 #endif
@@ -111,5 +113,13 @@ int main() {
     printf("\n\nprimality test performance on small non-prime integers\n");
 #endif
     benchmark_primality_test(small_non_prime_examples, NUM_OF_SMALL_PRIME_EXAMPLES);
+#endif
+
+    FILE *gnuplot = popen("gnuplot", "w");
+    fprintf(gnuplot, "plot '-'\n");
+    for (int i = 0; i < 100; i += 1)
+        fprintf(gnuplot, "%d %d\n", i, i * i);
+    fprintf(gnuplot, "e\n");
+    fflush(gnuplot);
     return 0;
 }
