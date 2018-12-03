@@ -52,7 +52,7 @@ char parallel_primality_test_using_promotion_of_scalar(unsigned long long intege
         {
             int thread_id = omp_get_thread_num();
             unsigned long long local_begin = thread_id * local_steps;
-            if (local_begin < 50) local_begin = 50;
+            if (local_begin < 3) local_begin = 3;
             unsigned long long local_end = local_ends[thread_id];
             printf("thread_id:%d local_begin:%llu local_end:%llu\n", thread_id, local_begin, local_end);
             is_prime[thread_id] = local_primality_test(integer_n, local_begin, local_end);
@@ -111,6 +111,7 @@ char parallel_primality_test_using_sentinel(unsigned long long integer_n) {
         {
             int thread_id = omp_get_thread_num();
             unsigned long long local_begin = thread_id * local_steps;
+            if (local_begin < 3) local_begin = 3;
             unsigned long long local_end = local_ends[thread_id];
             printf("thread_id:%d local_begin:%llu local_end:%llu\n", thread_id, local_begin, local_end);
             is_prime[thread_id] = local_primality_test(integer_n, local_begin, local_end);
