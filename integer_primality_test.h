@@ -17,6 +17,8 @@ int parallel_primality_test_using_promotion_of_scalar(unsigned long long);
 
 int parallel_primality_test_using_sentinel(unsigned long long);
 
-void verify_primality_test(int (*)(unsigned long long), unsigned long long *, int);
+void verify_primality_test_on_primes(int (*)(unsigned long long), unsigned long long *, int);
+
+void verify_primality_test_on_non_primes(int (*)(unsigned long long), unsigned long long *, int);
 
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_PRIMALITY_TEST_H

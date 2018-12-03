@@ -15,22 +15,23 @@ typedef struct {
     double parallel_primality_test_using_sentinel;
 } primality_statistics;
 
-unsigned long long large_prime_examples[NUM_OF_LARGE_PRIME_EXAMPLES] = {
-        345345342347ull,
-        345345342373ull,
-        345345342379ull,
-        345345342389ull,
-        345345342403ull,
-        345345342439ull
-};
 
 unsigned long long small_prime_examples[NUM_OF_SMALL_PRIME_EXAMPLES] = {
-        7507ull,
-        7517ull,
-        7523ull,
-        7529ull,
-        7537ull,
-        7541ull
+        1000000007ull,
+        1000000009ull,
+        1000000021ull,
+        1000000033ull,
+        1000000087ull,
+        1000000093ull
+};
+
+unsigned long long small_non_prime_examples[NUM_OF_SMALL_PRIME_EXAMPLES] = {
+        1000000011ull,
+        1000000015ull,
+        1000000017ull,
+        1000000019ull,
+        1000000023ull,
+        1000000025ull
 };
 
 void benchmark_primality_test(unsigned long long *examples, int number_of_prime_examples) {
@@ -50,7 +51,7 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
                         examples[a]);
     }
 
-    printf("serial_primality_test:\n%e\n", primality_stats.serial_primality_test / number_of_prime_examples);
+    //printf("serial_primality_test:\n%e\n", primality_stats.serial_primality_test / number_of_prime_examples);
     printf("parallel_primality_test_using_promotion_of_scalar:\n%e\n",
            primality_stats.parallel_primality_test_using_promotion_of_scalar / number_of_prime_examples);
     printf("parallel_primality_test_using_sentinel:\n%e\n",
@@ -58,42 +59,57 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
 }
 
 int main() {
-    printf("verifying primality test of small primes\n");
-    verify_primality_test(
-            serial_primality_test,
-            small_prime_examples,
-            NUM_OF_SMALL_PRIME_EXAMPLES);
-    printf("serial primality test tests passed\n");
-    verify_primality_test(
-            parallel_primality_test_using_promotion_of_scalar,
-            small_prime_examples,
-            NUM_OF_SMALL_PRIME_EXAMPLES);
-    printf("parallel primality test using promotion of scalar verification tests passed\n");
-    verify_primality_test(
-            parallel_primality_test_using_sentinel,
-            small_prime_examples,
-            NUM_OF_SMALL_PRIME_EXAMPLES);
-    printf("parallel primality test using sentinel verification tests passed\n");
-    printf("verifying primality test of large primes\n");
-    verify_primality_test(
-            serial_primality_test,
-            large_prime_examples,
-            NUM_OF_LARGE_PRIME_EXAMPLES);
-    printf("serial primality test tests passed\n");
-    verify_primality_test(
-            parallel_primality_test_using_promotion_of_scalar,
-            large_prime_examples,
-            NUM_OF_LARGE_PRIME_EXAMPLES);
-    printf("parallel primality test using promotion of scalar verification tests passed\n");
-    verify_primality_test(
-            parallel_primality_test_using_sentinel,
-            large_prime_examples,
-            NUM_OF_LARGE_PRIME_EXAMPLES);
-    printf("parallel primality test using sentinel verification tests passed\n");
 
-    printf("primality test performance on large integers\n");
-    benchmark_primality_test(large_prime_examples, NUM_OF_LARGE_PRIME_EXAMPLES);
-    printf("\n\nprimality test performance on small integers\n");
+#if VERBOSE
+    printf("verifying serial primality test\n");
+#endif
+    verify_primality_test_on_primes(
+            serial_primality_test,
+            small_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+    verify_primality_test_on_non_primes(
+            serial_primality_test,
+            small_non_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+#if VERBOSE
+    printf("serial primality test tests passed\n");
+#endif
+#if VERBOSE
+    printf("verifying parallel primality test using promotion of scalar\n");
+#endif
+    verify_primality_test_on_primes(
+            parallel_primality_test_using_promotion_of_scalar,
+            small_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+    verify_primality_test_on_non_primes(
+            parallel_primality_test_using_promotion_of_scalar,
+            small_non_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+#if VERBOSE
+    printf("parallel primality test using promotion of scalar verification tests passed\n");
+#endif
+#if VERBOSE
+    printf("verifying parallel primality test using sentinel\n");
+#endif
+    verify_primality_test_on_primes(
+            parallel_primality_test_using_sentinel,
+            small_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+    verify_primality_test_on_non_primes(
+            parallel_primality_test_using_sentinel,
+            small_non_prime_examples,
+            NUM_OF_SMALL_PRIME_EXAMPLES);
+
+#if VERBOSE
+    printf("parallel primality test using sentinel verification tests passed\n");
+#endif
+#if VERBOSE
+    printf("\n\nprimality test performance on small prime integers\n");
+#endif
     benchmark_primality_test(small_prime_examples, NUM_OF_SMALL_PRIME_EXAMPLES);
+#if VERBOSE
+    printf("\n\nprimality test performance on small non-prime integers\n");
+#endif
+    benchmark_primality_test(small_non_prime_examples, NUM_OF_SMALL_PRIME_EXAMPLES);
     return 0;
 }

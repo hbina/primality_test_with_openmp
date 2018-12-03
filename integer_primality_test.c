@@ -47,6 +47,9 @@ int parallel_primality_test_using_promotion_of_scalar(unsigned long long integer
             if (!(local_end % 2ull)) local_end--;
             for (; local_begin <= local_end; local_begin += 2ull) {
                 if (integer_n % local_begin == 0) {
+#if VERBOSE
+                    printf("failed on %llu\n", local_begin);
+#endif
                     local_is_prime = false;
                     goto end;
                 }
@@ -62,24 +65,31 @@ int parallel_primality_test_using_promotion_of_scalar(unsigned long long integer
     }
 }
 
-void verify_primality_test(
+void verify_primality_test_on_primes(
         int (*prime_function)(unsigned long long int),
         unsigned long long *prime_examples,
         int num_of_prime_examples
 ) {
-    for (unsigned long long integer_n = 4; integer_n < 1000l; integer_n += 2l) {
-        assert(prime_function(integer_n) == false);
-    }
-    printf("the following integers should be prime\n");
+#if VERBOSE
+    printf("verifying primality test on primes\n");
+#endif
     for (int a = 0; a < num_of_prime_examples; a++) {
-        // assert(prime_function(prime_examples[a]) == true);
-        printf("%llu is prime:%d\n", prime_examples[a], prime_function(prime_examples[a]));
+        int is_prime = prime_function(prime_examples[a]);
+        assert(is_prime == true);
     }
-    printf("the following integers should not be prime\n");
+}
+
+void verify_primality_test_on_non_primes(
+        int (*prime_function)(unsigned long long int),
+        unsigned long long *prime_examples,
+        int num_of_prime_examples
+) {
+#if VERBOSE
+    printf("verifying primality test on non-primes\n");
+#endif
     for (int a = 0; a < num_of_prime_examples; a++) {
-        unsigned long long not_prime = prime_examples[a] - 2;
-        // assert(prime_function(not_prime) == false);
-        printf("%llu is prime:%d\n", not_prime, prime_function(not_prime));
+        int is_prime = prime_function(prime_examples[a]);
+        assert(is_prime == false);
     }
 }
 
@@ -90,7 +100,7 @@ int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
     } else {
         int is_prime[4] = {true, true, true, true};
         unsigned long long local_steps = integer_n / 8ull;
-        if (!(local_steps % 2)) local_steps++;
+        if (!(local_steps % 2ull)) local_steps++;
 #pragma omp parallel num_threads(4)
         {
             int local_is_prime = true;
@@ -102,6 +112,9 @@ int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
             if (!(local_end % 2ull)) local_end--;
             for (; local_begin <= local_end; local_begin += 2ull) {
                 if (integer_n % local_begin == 0) {
+#if VERBOSE
+                    printf("failed on %llu\n", local_begin);
+#endif
                     local_is_prime = false;
                     goto end;
                 }
@@ -109,7 +122,7 @@ int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
                 for (int a = 0; a < 4; a++) {
                     final_is_prime &= is_prime[a];
                 }
-                if (!final_is_prime){
+                if (!final_is_prime) {
                     goto end;
                 }
             }
