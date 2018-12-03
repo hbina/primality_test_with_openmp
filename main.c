@@ -16,21 +16,21 @@ typedef struct {
 } primality_statistics;
 
 unsigned long long large_prime_examples[NUM_OF_LARGE_PRIME_EXAMPLES] = {
-        345345342347l,
-        345345342373l,
-        345345342379l,
-        345345342389l,
-        345345342403l,
-        345345342439l
+        345345342347ull,
+        345345342373ull,
+        345345342379ull,
+        345345342389ull,
+        345345342403ull,
+        345345342439ull
 };
 
 unsigned long long small_prime_examples[NUM_OF_SMALL_PRIME_EXAMPLES] = {
-        7507l,
-        7517l,
-        7523l,
-        7529l,
-        7537l,
-        7541l
+        7507ull,
+        7517ull,
+        7523ull,
+        7529ull,
+        7537ull,
+        7541ull
 };
 
 void benchmark_primality_test(unsigned long long *examples, int number_of_prime_examples) {
@@ -74,7 +74,6 @@ int main() {
             small_prime_examples,
             NUM_OF_SMALL_PRIME_EXAMPLES);
     printf("parallel primality test using sentinel verification tests passed\n");
-
     printf("verifying primality test of large primes\n");
     verify_primality_test(
             serial_primality_test,

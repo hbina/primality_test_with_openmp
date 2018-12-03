@@ -7,66 +7,63 @@
 #include <assert.h>
 #include <omp.h>
 
-char
-local_primality_test(unsigned long long integer_of, unsigned long long integer_from, unsigned long long integer_to) {
-    if (!integer_of) {
+
+int local_primality_test(
+        unsigned long long integer_of,
+        unsigned long long integer_from,
+        unsigned long long integer_to) {
+    if (integer_of <= 1ull) {
         return false;
-    } else if (integer_of == 1l) {
-        return true;
-    } else if (!(integer_of % 2l)) {
+    } else if (!(integer_of % 2ull)) {
         return false;
     } else {
-        while ((integer_of % integer_from) && (integer_from < integer_to)) {
-            integer_from += 2l;
+        for (; integer_from <= integer_to; integer_from += 2ull) {
+            if (integer_of % integer_from == 0) return 0;
         }
-        return integer_of == integer_from;
+        return 1;
     }
 }
 
-char serial_primality_test(unsigned long long integer_n) {
-    return local_primality_test(integer_n, 3, integer_n);
+int serial_primality_test(unsigned long long integer_n) {
+    return local_primality_test(integer_n, 3, integer_n / 2);
 }
 
-char parallel_primality_test_using_promotion_of_scalar(unsigned long long integer_n) {
-    if (integer_n < 100) {
-        return serial_primality_test(integer_n);
-    } else if (!(integer_n % 2l)) {
+int parallel_primality_test_using_promotion_of_scalar(unsigned long long integer_n) {
+    if (integer_n <= 1ull) return false;
+    if (!(integer_n % 2ull)) {
         return false;
     } else {
-        char is_prime[4] = {1};
-        unsigned long long local_steps = integer_n / 4l;
-        unsigned long long local_ends[] = {
-                local_steps,
-                2 * local_steps,
-                3 * local_steps,
-                4 * local_steps
-        };
-        printf("local_steps:%llu 0:%llu 1:%llu 2:%llu 3:%llu\n",
-               local_steps,
-               local_ends[0],
-               local_ends[1],
-               local_ends[2],
-               local_ends[3]
-        );
+        int is_prime[4] = {true, true, true, true};
+        unsigned long long local_steps = integer_n / 8ull;
+        if (!(local_steps % 2)) local_steps++;
 #pragma omp parallel num_threads(4)
         {
+            int local_is_prime = true;
             int thread_id = omp_get_thread_num();
             unsigned long long local_begin = thread_id * local_steps;
-            if (local_begin < 3) local_begin = 3;
-            unsigned long long local_end = local_ends[thread_id];
-            printf("thread_id:%d local_begin:%llu local_end:%llu\n", thread_id, local_begin, local_end);
-            is_prime[thread_id] = local_primality_test(integer_n, local_begin, local_end);
+            if (local_begin < 3ull) local_begin = 3;
+            if (!(local_begin % 2ull)) local_begin--;
+            unsigned long long local_end = local_begin + local_steps;
+            if (!(local_end % 2ull)) local_end--;
+            for (; local_begin <= local_end; local_begin += 2ull) {
+                if (integer_n % local_begin == 0) {
+                    local_is_prime = false;
+                    goto end;
+                }
+            }
+            end:
+            is_prime[thread_id] = local_is_prime;
         };
-        char final_bool = false;
-        for (int a = 0; a < omp_get_max_threads(); a++) {
-            final_bool |= is_prime[a];
+        int final_bool = true;
+        for (int a = 0; a < 4; a++) {
+            final_bool &= is_prime[a];
         }
         return final_bool;
     }
 }
 
 void verify_primality_test(
-        char (*prime_function)(unsigned long long int),
+        int (*prime_function)(unsigned long long int),
         unsigned long long *prime_examples,
         int num_of_prime_examples
 ) {
@@ -86,39 +83,42 @@ void verify_primality_test(
     }
 }
 
-char parallel_primality_test_using_sentinel(unsigned long long integer_n) {
-    if (integer_n < 100) {
-        return serial_primality_test(integer_n);
-    } else if (!(integer_n % 2l)) {
+int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
+    if (integer_n <= 1ull) return false;
+    if (!(integer_n % 2ull)) {
         return false;
     } else {
-        char is_prime[4] = {1};
-        unsigned long long local_steps = integer_n / 4l;
-        unsigned long long local_ends[] = {
-                local_steps,
-                2 * local_steps,
-                3 * local_steps,
-                4 * local_steps
-        };
-        printf("local_steps:%llu 0:%llu 1:%llu 2:%llu 3:%llu\n",
-               local_steps,
-               local_ends[0],
-               local_ends[1],
-               local_ends[2],
-               local_ends[3]
-        );
+        int is_prime[4] = {true, true, true, true};
+        unsigned long long local_steps = integer_n / 8ull;
+        if (!(local_steps % 2)) local_steps++;
 #pragma omp parallel num_threads(4)
         {
+            int local_is_prime = true;
             int thread_id = omp_get_thread_num();
             unsigned long long local_begin = thread_id * local_steps;
-            if (local_begin < 3) local_begin = 3;
-            unsigned long long local_end = local_ends[thread_id];
-            printf("thread_id:%d local_begin:%llu local_end:%llu\n", thread_id, local_begin, local_end);
-            is_prime[thread_id] = local_primality_test(integer_n, local_begin, local_end);
+            if (local_begin < 3ull) local_begin = 3;
+            if (!(local_begin % 2ull)) local_begin--;
+            unsigned long long local_end = local_begin + local_steps;
+            if (!(local_end % 2ull)) local_end--;
+            for (; local_begin <= local_end; local_begin += 2ull) {
+                if (integer_n % local_begin == 0) {
+                    local_is_prime = false;
+                    goto end;
+                }
+                int final_is_prime = true;
+                for (int a = 0; a < 4; a++) {
+                    final_is_prime &= is_prime[a];
+                }
+                if (!final_is_prime){
+                    goto end;
+                }
+            }
+            end:
+            is_prime[thread_id] = local_is_prime;
         };
-        char final_bool = false;
-        for (int a = 0; a < omp_get_max_threads(); a++) {
-            final_bool |= is_prime[a];
+        int final_bool = true;
+        for (int a = 0; a < 4; a++) {
+            final_bool &= is_prime[a];
         }
         return final_bool;
     }

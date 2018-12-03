@@ -9,15 +9,14 @@
 #define false 0
 
 
-char local_primality_test(unsigned long long, unsigned long long, unsigned long long);
+int local_primality_test(unsigned long long, unsigned long long, unsigned long long);
 
-char serial_primality_test(unsigned long long);
+int serial_primality_test(unsigned long long);
 
-char parallel_primality_test_using_promotion_of_scalar(unsigned long long);
+int parallel_primality_test_using_promotion_of_scalar(unsigned long long);
 
-char parallel_primality_test_using_sentinel(unsigned long long);
+int parallel_primality_test_using_sentinel(unsigned long long);
 
-void
-verify_primality_test(char (*)(unsigned long long), unsigned long long *, int);
+void verify_primality_test(int (*)(unsigned long long), unsigned long long *, int);
 
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_INTEGER_PRIMALITY_TEST_H

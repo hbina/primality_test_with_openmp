@@ -12,7 +12,7 @@ double addition_benchmark_wrapper(unsigned long long (*func)(unsigned long long)
 }
 
 double
-primality_test_benchmark_wrapper(char (*func1)(unsigned long long),
+primality_test_benchmark_wrapper(int (*func1)(unsigned long long),
                                  unsigned long long integer_n) {
     double t_begin = omp_get_wtime();
     func1(integer_n);

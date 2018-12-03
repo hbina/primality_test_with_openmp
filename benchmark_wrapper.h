@@ -7,6 +7,6 @@
 
 double addition_benchmark_wrapper(unsigned long long (*func)(unsigned long long), unsigned long long);
 
-double primality_test_benchmark_wrapper(char (*)(unsigned long long), unsigned long long);
+double primality_test_benchmark_wrapper(int (*)(unsigned long long), unsigned long long);
 
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_BENCHMARK_WRAPPER_H
