@@ -65,10 +65,11 @@ void verify_primality_test(
         int num_of_prime_examples
 ) {
     for (unsigned long long integer_n = 4; integer_n < 1000l; integer_n += 2l) {
-        assert(parallel_primality_test_using_promotion_of_scalar(integer_n) == false);
+        assert(prime_function(integer_n) == false);
     }
     for (int a = 0; a < num_of_prime_examples; a++) {
         assert(prime_function(prime_examples[a]) == true);
+        printf("%llu is prime:%d", prime_examples[a], prime_function(prime_examples[a]));
     }
 }
 
