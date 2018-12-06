@@ -7,6 +7,28 @@
 #include <assert.h>
 #include <omp.h>
 
+void initUllArray(UllArray *a, int initialSize) {
+    a->array = (unsigned long long *) malloc(initialSize * sizeof(unsigned long long));
+    a->used = 0ull;
+    a->size = initialSize;
+}
+
+void insertUllArray(UllArray *a, unsigned long long element) {
+    // a->used is the number of used entries, because a->array[a->used++] updates a->used only *after* the array has been accessed.
+    // Therefore a->used can go up to a->size
+    if (a->used == a->size) {
+        a->size *= 2;
+        a->array = (unsigned long long *) realloc(a->array, a->size * sizeof(unsigned long long));
+    }
+    a->array[a->used++] = element;
+}
+
+void freeUllArray(UllArray *a) {
+    free(a->array);
+    a->array = NULL;
+    a->used = a->size = 0;
+}
+
 unsigned long long get_first_prime_divisor(unsigned long long integer_of) {
     if (integer_of <= 1ull) {
         return 1ull;
@@ -144,3 +166,13 @@ int parallel_primality_test_sentinel(unsigned long long integer_n) {
         return is_prime;
     }
 }
+
+void find_all_primes(unsigned long long integer_to, int (*func)(unsigned long long), UllArray *arrayOfPrimes) {
+    initUllArray(arrayOfPrimes, 5);
+    for (unsigned long long integer_from = 0ull; integer_from < integer_to; integer_from++) {
+        if (func(integer_from)) {
+            insertUllArray(arrayOfPrimes, integer_from);
+        }
+    }
+}
+

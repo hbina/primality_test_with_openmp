@@ -15,10 +15,10 @@ double addition_benchmark_wrapper(unsigned long long (*func)(unsigned long long)
 }
 
 double
-primality_test_benchmark_wrapper(int (*func1)(unsigned long long),
+primality_test_benchmark_wrapper(int (*function_to_benchmark)(unsigned long long),
                                  unsigned long long integer_n) {
     double t_begin = omp_get_wtime();
-    func1(integer_n);
+    function_to_benchmark(integer_n);
     double t_diff = omp_get_wtime() - t_begin;
     return t_diff;
 }
@@ -44,4 +44,12 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
            primality_stats.parallel_primality_test_using_promotion_of_scalar / number_of_prime_examples);
     printf("parallel_primality_test_sentinel:\n%e\n",
            primality_stats.parallel_primality_test_using_sentinel / number_of_prime_examples);
+}
+
+void benchmark_find_all_primes(unsigned long long integer_n, int (*func)(unsigned long long)) {
+    UllArray ullArray;
+    double t_begin = omp_get_wtime();
+    double t_diff = omp_get_wtime() - t_begin;
+    printf("it took %e seconds to find all the primes between 3 and %llu", t_diff, integer_n);
+    find_all_primes(integer_n, func, &ullArray);
 }

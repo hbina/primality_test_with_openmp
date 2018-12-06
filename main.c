@@ -57,11 +57,11 @@ int main() {
     printf("verifying parallel primality test using sentinel\n");
 #endif
     verify_primality_test_on_primes(
-            parallel_primality_test_sentinel,
+            &parallel_primality_test_sentinel,
             small_prime_examples,
             NUM_OF_SMALL_PRIME_EXAMPLES);
     verify_primality_test_on_non_primes(
-            parallel_primality_test_sentinel,
+            &parallel_primality_test_sentinel,
             small_non_prime_examples,
             NUM_OF_SMALL_PRIME_EXAMPLES);
 #if ENABLE_VERBOSE
@@ -79,5 +79,6 @@ int main() {
 #endif
     benchmark_primality_test(small_non_prime_examples, NUM_OF_SMALL_PRIME_EXAMPLES);
 #endif
+    benchmark_find_all_primes(100000000ull, &parallel_primality_test_sentinel);
     return 0;
 }

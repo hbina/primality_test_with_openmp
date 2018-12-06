@@ -23,4 +23,6 @@ double primality_test_benchmark_wrapper(int (*)(unsigned long long), unsigned lo
 
 void benchmark_primality_test(unsigned long long *, int);
 
+void benchmark_find_all_primes(unsigned long long, int (*)(unsigned long long));
+
 #endif //PERFORMANCE_OF_PRIME_PRIMALITY_BENCHMARK_WRAPPER_H

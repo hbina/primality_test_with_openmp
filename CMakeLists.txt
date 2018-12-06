@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(performance_of_prime_primality C)
 
 add_definitions(-DNUMBER_OF_THREADS=4)
-add_definitions(-DENABLE_UNIT_TEST=1)
-add_definitions(-DENABLE_BENCMARK=1)
-add_definitions(-DENABLE_VERBOSE=1)
+add_definitions(-DENABLE_UNIT_TEST=0)
+add_definitions(-DENABLE_BENCMARK=0)
+add_definitions(-DENABLE_VERBOSE=0)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
