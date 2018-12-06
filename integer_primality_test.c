@@ -13,13 +13,17 @@ unsigned long long get_first_prime_divisor(unsigned long long integer_of) {
     } else if (!(integer_of % 2ull)) {
         return 2ull;
     } else {
-        for (unsigned long long integer_from = 3ull; integer_from <= integer_of / 2; integer_from += 2ull) {
+        for (unsigned long long integer_from = 3ull; integer_from * integer_from <= integer_of; integer_from += 2ull) {
             if (integer_of % integer_from == 0ull) {
+#if ENABLE_VERBOSE
                 printf("first prime divisor of %llu is %llu\n", integer_of, integer_from);
+#endif
                 return integer_from;
             }
         }
+#if ENABLE_VERBOSE
         printf("first prime divisor of %llu is itself\n", integer_of);
+#endif
         return integer_of;
     }
 }
@@ -44,17 +48,19 @@ int serial_primality_test(unsigned long long integer_n) {
     return local_primality_test(integer_n, 3, integer_n / 2);
 }
 
-int parallel_primality_test_using_promotion_of_scalar(unsigned long long integer_n) {
+int parallel_primality_test_basic(unsigned long long integer_n) {
+#if ENABLE_VERBOSE
+    printf("testing primality on %llu\n", integer_n);
+#endif
     if (integer_n <= 1ull) return false;
     if (!(integer_n % 2ull)) {
         return false;
     } else {
-        int is_prime[4] = {true, true, true, true};
+        int is_prime = true;
         unsigned long long local_steps = integer_n / 8ull;
         if (!(local_steps % 2)) local_steps++;
-#pragma omp parallel num_threads(4)
+#pragma omp parallel
         {
-            int local_is_prime = true;
             int thread_id = omp_get_thread_num();
             unsigned long long local_begin = thread_id * local_steps;
             if (local_begin < 3ull) local_begin = 3;
@@ -63,21 +69,14 @@ int parallel_primality_test_using_promotion_of_scalar(unsigned long long integer
             if (!(local_end % 2ull)) local_end--;
             for (; local_begin <= local_end; local_begin += 2ull) {
                 if (integer_n % local_begin == 0) {
-#if VERBOSE
+#if ENABLE_VERBOSE
                     printf("failed on %llu\n", local_begin);
 #endif
-                    local_is_prime = false;
-                    goto end;
+                    is_prime = false;
                 }
             }
-            end:
-            is_prime[thread_id] = local_is_prime;
         };
-        int final_bool = true;
-        for (int a = 0; a < 4; a++) {
-            final_bool &= is_prime[a];
-        }
-        return final_bool;
+        return is_prime;
     }
 }
 
@@ -86,7 +85,7 @@ void verify_primality_test_on_primes(
         unsigned long long *prime_examples,
         int num_of_prime_examples
 ) {
-#if VERBOSE
+#if ENABLE_VERBOSE
     printf("verifying primality test on primes\n");
 #endif
     for (int a = 0; a < num_of_prime_examples; a++) {
@@ -100,7 +99,7 @@ void verify_primality_test_on_non_primes(
         unsigned long long *prime_examples,
         int num_of_prime_examples
 ) {
-#if VERBOSE
+#if ENABLE_VERBOSE
     printf("verifying primality test on non-primes\n");
 #endif
     for (int a = 0; a < num_of_prime_examples; a++) {
@@ -109,18 +108,21 @@ void verify_primality_test_on_non_primes(
     }
 }
 
-int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
+int parallel_primality_test_sentinel(unsigned long long integer_n) {
+#if ENABLE_VERBOSE
+    printf("testing primality on %llu\n", integer_n);
+#endif
     if (integer_n <= 1ull) return false;
     if (!(integer_n % 2ull)) {
         return false;
     } else {
-        int is_prime[4] = {true, true, true, true};
-        unsigned long long local_steps = integer_n / 8ull;
-        if (!(local_steps % 2ull)) local_steps++;
-#pragma omp parallel num_threads(4)
+        int is_prime = true;
+#pragma omp parallel
         {
-            int local_is_prime = true;
             int thread_id = omp_get_thread_num();
+            unsigned long long local_steps = integer_n / 2ull;
+            local_steps /= ((unsigned long long) omp_get_num_threads());
+            if (!(local_steps % 2ull)) local_steps++;
             unsigned long long local_begin = thread_id * local_steps;
             if (local_begin < 3ull) local_begin = 3;
             if (!(local_begin % 2ull)) local_begin--;
@@ -128,27 +130,17 @@ int parallel_primality_test_using_sentinel(unsigned long long integer_n) {
             if (!(local_end % 2ull)) local_end--;
             for (; local_begin <= local_end; local_begin += 2ull) {
                 if (integer_n % local_begin == 0) {
-#if VERBOSE
+#if ENABLE_VERBOSE
                     printf("failed on %llu\n", local_begin);
 #endif
-                    local_is_prime = false;
-                    goto end;
+                    is_prime = false;
+                    local_begin = local_end;
                 }
-                int final_is_prime = true;
-                for (int a = 0; a < 4; a++) {
-                    final_is_prime &= is_prime[a];
-                }
-                if (!final_is_prime) {
-                    goto end;
+                if (!is_prime) {
+                    local_begin = local_end;
                 }
             }
-            end:
-            is_prime[thread_id] = local_is_prime;
         };
-        int final_bool = true;
-        for (int a = 0; a < 4; a++) {
-            final_bool &= is_prime[a];
-        }
-        return final_bool;
+        return is_prime;
     }
 }

@@ -15,9 +15,9 @@ int local_primality_test(unsigned long long, unsigned long long, unsigned long l
 
 int serial_primality_test(unsigned long long);
 
-int parallel_primality_test_using_promotion_of_scalar(unsigned long long);
+int parallel_primality_test_basic(unsigned long long);
 
-int parallel_primality_test_using_sentinel(unsigned long long);
+int parallel_primality_test_sentinel(unsigned long long);
 
 void verify_primality_test_on_primes(int (*)(unsigned long long), unsigned long long *, int);
 
