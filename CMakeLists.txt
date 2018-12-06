@@ -21,4 +21,4 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-add_executable(performance_of_prime_primality main.c integer_addition_up_to_n.h benchmark_wrapper.h integer_addition_up_to_n.c benchmark_wrapper.c integer_primality_test.c integer_primality_test.h)
+add_executable(performance_of_prime_primality main.c integer_addition_up_to_n.h benchmark_wrapper.h integer_addition_up_to_n.c benchmark_wrapper.c primality_test.c primality_test.h)

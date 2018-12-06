@@ -2,7 +2,7 @@
 // Created by hbina on 01/12/18.
 //
 
-#include "integer_primality_test.h"
+#include "primality_test.h"
 #include <stdio.h>
 #include <assert.h>
 #include <omp.h>
