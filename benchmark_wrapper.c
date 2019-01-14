@@ -49,7 +49,7 @@ void benchmark_primality_test(unsigned long long *examples, int number_of_prime_
 void benchmark_find_all_primes(unsigned long long integer_n, int (*func)(unsigned long long)) {
     UllArray ullArray;
     double t_begin = omp_get_wtime();
-    double t_diff = omp_get_wtime() - t_begin;
-    printf("it took %e seconds to find all the primes between 3 and %llu", t_diff, integer_n);
     find_all_primes(integer_n, func, &ullArray);
+    double t_diff = omp_get_wtime() - t_begin;
+    printf("it took %e seconds to find all the primes between 3 and %llu\n", t_diff, integer_n);
 }

@@ -79,6 +79,6 @@ int main() {
 #endif
     benchmark_primality_test(small_non_prime_examples, NUM_OF_SMALL_PRIME_EXAMPLES);
 #endif
-    benchmark_find_all_primes(100000000ull, &parallel_primality_test_sentinel);
+    benchmark_find_all_primes(10000ull, &parallel_primality_test_sentinel);
     return 0;
 }
